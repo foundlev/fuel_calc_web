@@ -37,7 +37,9 @@ function handleDensityInput(value) {
 
 function checkMaxLength() {
     if (activeInput.value.length >= maxLengths[activeInput.id]) {
-        switchField(1);
+        if (activeInput.id !== 'fob') {
+            switchField(1);
+        }
     }
 }
 
@@ -59,6 +61,7 @@ function handleBackspace() {
     if (activeInput) {
         activeInput.value = activeInput.value.slice(0, -1);
         validateInputs();
+        activeInput.focus();
     }
 }
 
@@ -102,7 +105,7 @@ function validateInputs() {
         }
         statusCard.innerHTML = `
             <div class="status-icon"><i class="fas fa-gas-pump"></i></div>
-            <div class="status-content" id="statusContent">Заправка (кг): ${fuelKg.toFixed(0)}</div>
+            <div class="status-content" id="statusContent">Заправка: ${fuelKg.toFixed(0)} кг</div>
         `;
         statusCard.style.background = 'var(--status-bg)';
         return;
@@ -137,7 +140,7 @@ function validateInputs() {
 
     // Если ни одно из условий не выполнено – отображаем начальное состояние
     statusCard.innerHTML = `
-        <div class="status-icon"><i class="fa-solid fa-pen"></i></div>
+        <div class="status-icon"><i class="fa-solid fa-arrow-down-long"></i></div>
         <div class="status-content" id="statusContent">Введите значения</div>
     `;
     statusCard.style.background = 'var(--status-bg)';
@@ -160,4 +163,6 @@ document.querySelectorAll('input').forEach(input => {
             input.value = value.slice(0,5);
         }
     });
+
+    activeInput.focus();
 });
