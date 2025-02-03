@@ -85,12 +85,12 @@
         }
 
         .fuel-value {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
         .comparison-sign {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             margin: 0 0.5rem;
         }
 
@@ -385,7 +385,7 @@
             let fuelKg = 0;
             if (liters && density >= 0.75 && density <= 0.86) {
                 fuelKg = liters * density;
-                totalCalc.textContent = `${(fuelKg + (remainder || 0)).toFixed(1)} кг`;
+                totalCalc.textContent = `${(fuelKg + (remainder || 0)).toFixed(0)}`;
             } else {
                 totalCalc.textContent = '-';
             }
@@ -398,8 +398,8 @@
 
                 statusCard.style.background = isValid ? 'var(--success)' : 'var(--error)';
                 statusIcon.innerHTML = isValid ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
-                fobValue.textContent = `${fob} кг`;
-                deviationInfo.innerHTML = `<i class="fas fa-balance-scale"></i> ${diff.toFixed(1)} кг`;
+                fobValue.textContent = `${fob}`;
+                deviationInfo.innerHTML = `Разница: ${diff.toFixed(0)} кг`;
             } else {
                 statusCard.style.background = 'var(--status-bg)';
                 statusIcon.innerHTML = '';
