@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Control System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --text: #2d3436;
+            --primary: #4a6ee0;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --border: #dfe6e9;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --status-bg: #4a6ee0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f172a;
+                --surface: #1e293b;
+                --text: #f8fafc;
+                --border: #334155;
+                --status-bg: #3b5998;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            margin: auto;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .status-card {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: var(--status-bg);
+            color: white;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-icon {
+            font-size: 1.5rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .status-content {
+            flex-grow: 1;
+        }
+
+        .calculation-line {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .fuel-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .comparison-sign {
+            font-size: 1.4rem;
+            margin: 0 0.5rem;
+        }
+
+        .calculation-line i {
+            margin: 0;
+        }
+
+        .deviation {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .input-grid {
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text);
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 1.1rem;
+            outline: none;
+            caret-color: transparent;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 110, 224, 0.15);
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+        }
+
+        .key {
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        .nav-key {
+            background: rgba(74, 110, 224, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 14px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-card" id="statusCard">
+            <div class="status-icon"></div>
+            <div class="status-content">
+                <div class="calculation-line">
+                    <i class="fas fa-gas-pump comparison-sign"></i>
+                    <span class="fuel-value" id="totalCalc">-</span>
+                     |
+                    <i class="fas fa-plane comparison-sign"></i>
+                    <span class="fuel-value" id="fobValue">-</span>
+                </div>
+                <div class="deviation" id="deviationInfo"></div>
+            </div>
+        </div>
+
+        <div class="input-grid">
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <label>Заправка (л)</label>
+                    <input type="number" id="liters" inputmode="decimal" maxlength="5">
+                </div>
+                <div class="input-wrapper">
+                    <label>Плотность</label>
+                    <input type="text" id="density" placeholder="0.7500" maxlength="5">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-wrapper">
+                    <label>Остаток (кг)</label>
+                    <input type="number" id="remainder" inputmode="decimal" maxlength="4">
+                </div>
+                <div class="input-wrapper">
+                    <label>FOB (кг)</label>
+                    <input type="number" id="fob" inputmode="decimal" maxlength="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="keyboard">
+            <button class="key" onclick="handleInput('1')">1</button>
+            <button class="key" onclick="handleInput('2')">2</button>
+            <button class="key" onclick="handleInput('3')">3</button>
+            <button class="key nav-key" onclick="switchField(1)">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="key" onclick="handleInput('4')">4</button>
+            <button class="key" onclick="handleInput('5')">5</button>
+            <button class="key" onclick="handleInput('6')">6</button>
+            <button class="key nav-key" onclick="switchField(-1)">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button class="key" onclick="handleInput('7')">7</button>
+            <button class="key" onclick="handleInput('8')">8</button>
+            <button class="key" onclick="handleInput('9')">9</button>
+            <button class="key nav-key" onclick="clearField()">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="key" onclick="handleInput('.')">.</button>
+            <button class="key" onclick="handleInput('0')">0</button>
+            <button class="key" onclick="handleBackspace()">
+                <i class="fas fa-backspace"></i>
+            </button>
+            <button class="key nav-key" onclick="showResetModal()">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+
+        <div id="resetModal" class="modal">
+            <div class="modal-content">
+                <h3>Очистить все данные?</h3>
+                <div class="modal-buttons">
+                    <button class="modal-btn" onclick="resetAll()">Да</button>
+                    <button class="modal-btn" onclick="hideResetModal()">Нет</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fields = ['liters', 'density', 'remainder', 'fob'];
+        const maxLengths = { liters: 5, density: 5, remainder: 4, fob: 5 };
+        let currentFieldIndex = 0;
+        let activeInput = document.getElementById(fields[0]);
+
+        function handleInput(value) {
+            if (!activeInput) return;
+
+            if (activeInput.id === 'density') {
+                handleDensityInput(value);
+            } else {
+                activeInput.value += value;
+                checkMaxLength();
+            }
+            validateInputs();
+        }
+
+        function handleDensityInput(value) {
+            let current = activeInput.value.replace(/[^0-9]/g, '');
+
+            if (value === '.') {
+                if (!current.includes('.')) current += '.';
+            } else {
+                current += value;
+            }
+
+            if (current.length === 4 && !current.startsWith('0')) {
+                current = '0.' + current;
+            } else if (current.length === 5 && current.startsWith('0')) {
+                current = current.slice(0,1) + '.' + current.slice(1,5);
+            }
+
+            activeInput.value = current.slice(0,6);
+            checkMaxLength();
+        }
+
+        function checkMaxLength() {
+            if (activeInput.value.length >= maxLengths[activeInput.id]) {
+                switchField(1);
+            }
+        }
+
+        function switchField(direction) {
+            currentFieldIndex = (currentFieldIndex + direction + fields.length) % fields.length;
+            activeInput = document.getElementById(fields[currentFieldIndex]);
+            activeInput.focus();
+        }
+
+        function clearField() {
+            if (activeInput) {
+                activeInput.value = '';
+                validateInputs();
+            }
+        }
+
+        function handleBackspace() {
+            if (activeInput) {
+                activeInput.value = activeInput.value.slice(0, -1);
+                validateInputs();
+            }
+        }
+
+        function showResetModal() {
+            document.getElementById('resetModal').style.display = 'flex';
+        }
+
+        function hideResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+        }
+
+        function resetAll() {
+            fields.forEach(id => document.getElementById(id).value = '');
+            currentFieldIndex = 0;
+            activeInput = document.getElementById(fields[0]);
+            hideResetModal();
+            validateInputs();
+        }
+
+        function validateInputs() {
+            const liters = parseFloat(document.getElementById('liters').value) || 0;
+            const densityValue = document.getElementById('density').value;
+            const density = parseFloat(densityValue);
+            const remainder = parseFloat(document.getElementById('remainder').value);
+            const fob = parseFloat(document.getElementById('fob').value);
+
+            const statusCard = document.getElementById('statusCard');
+            const statusIcon = statusCard.querySelector('.status-icon');
+            const totalCalc = document.getElementById('totalCalc');
+            const fobValue = document.getElementById('fobValue');
+            const deviationInfo = document.getElementById('deviationInfo');
+
+            // Расчет топлива
+            let fuelKg = 0;
+            if (liters && density >= 0.75 && density <= 0.86) {
+                fuelKg = liters * density;
+                totalCalc.textContent = `${(fuelKg + (remainder || 0)).toFixed(1)} кг`;
+            } else {
+                totalCalc.textContent = '-';
+            }
+
+            // Обновление статуса
+            if (!isNaN(fob) && !isNaN(remainder) && density >= 0.75 && density <= 0.86) {
+                const total = fuelKg + remainder;
+                const diff = Math.abs(fob - total);
+                const isValid = diff <= 200;
+
+                statusCard.style.background = isValid ? 'var(--success)' : 'var(--error)';
+                statusIcon.innerHTML = isValid ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
+                fobValue.textContent = `${fob} кг`;
+                deviationInfo.innerHTML = `<i class="fas fa-balance-scale"></i> ${diff.toFixed(1)} кг`;
+            } else {
+                statusCard.style.background = 'var(--status-bg)';
+                statusIcon.innerHTML = '';
+                fobValue.textContent = '-';
+                deviationInfo.textContent = '';
+            }
+        }
+
+        // Инициализация
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                activeInput = input;
+                currentFieldIndex = fields.indexOf(input.id);
+            });
+
+            input.addEventListener('blur', () => {
+                if (input.id === 'density') {
+                    let value = input.value.replace(/[^0-9.]/g, '');
+                    if (value.length === 4 && !value.includes('.')) {
+                        value = '0.' + value;
+                    }
+                    input.value = value.slice(0,5);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
