@@ -13,6 +13,7 @@ function handleInput(value) {
         checkMaxLength();
     }
     validateInputs();
+    activeInput.focus();
 }
 
 function handleDensityInput(value) {
@@ -50,6 +51,7 @@ function clearField() {
     if (activeInput) {
         activeInput.value = '';
         validateInputs();
+        activeInput.focus();
     }
 }
 
@@ -74,74 +76,73 @@ function resetAll() {
     activeInput = document.getElementById(fields[0]);
     hideResetModal();
     validateInputs();
+    activeInput.focus();
 }
 
 function validateInputs() {
-    const liters = parseFloat(document.getElementById('liters').value) || 0;
-    const densityValue = document.getElementById('density').value;
-    const density = parseFloat(densityValue);
-    const remainder = parseFloat(document.getElementById('remainder').value);
-    const fob = parseFloat(document.getElementById('fob').value);
-
-    const statusCard = document.getElementById('statusCard');
-    const statusIcon = statusCard.querySelector('.status-icon');
-    const totalCalc = document.getElementById('totalCalc');
-    const fobValue = document.getElementById('fobValue');
-    const deviationInfo = document.getElementById('deviationInfo');
-
-    // Получаем значения как строки (trim чтобы убрать лишние пробелы)
+    // Получаем значения полей как строки с обрезкой пробелов
     const litersStr = document.getElementById('liters').value.trim();
     const densityStr = document.getElementById('density').value.trim();
     const remainderStr = document.getElementById('remainder').value.trim();
     const fobStr = document.getElementById('fob').value.trim();
 
-    // Если заполнены только "Заправка (л)" и "Плотность", а остальные пусты:
-    if (litersStr !== "" && densityStr !== "" && remainderStr === "" && fobStr === "") {
-        const liters = parseFloat(litersStr);
-        const density = parseFloat(densityStr);
+    // Приводим числовые значения (если не указаны — 0)
+    const liters = parseFloat(litersStr) || 0;
+    const density = parseFloat(densityStr) || 0;
+    const remainder = parseFloat(remainderStr) || 0;
+    const fob = parseFloat(fobStr) || 0;
+
+    const statusCard = document.getElementById('statusCard');
+
+    // Если заполнены только "Заправка (л)" и "Плотность"
+    if (litersStr !== "" && densityStr !== "" && (remainderStr === "" || fobStr === "")) {
         let fuelKg = 0;
         if (density >= 0.75 && density <= 0.86) {
             fuelKg = liters * density;
         }
-        const statusCard = document.getElementById('statusCard');
+        statusCard.innerHTML = `
+            <div class="status-icon"><i class="fas fa-gas-pump"></i></div>
+            <div class="status-content" id="statusContent">Заправка (кг): ${fuelKg.toFixed(0)}</div>
+        `;
         statusCard.style.background = 'var(--status-bg)';
-        const statusIcon = statusCard.querySelector('.status-icon');
-        statusIcon.innerHTML = '<i class="fas fa-gas-pump"></i>';
-        // Отображаем текст с рассчитанным значением топлива в кг
-        const totalCalc = document.getElementById('statusContent');
-        totalCalc.textContent = `Заправка (кг): ${fuelKg.toFixed(0)}`;
-        // Очищаем оставшиеся элементы статуса
-        document.getElementById('fobValue').textContent = '';
-        document.getElementById('deviationInfo').textContent = '';
-        return; // завершаем выполнение функции, чтобы ниже не перезаписать
+        return;
     }
 
-    // Расчет топлива
-    let fuelKg = 0;
-    if (liters && density >= 0.75 && density <= 0.86) {
-        fuelKg = liters * density;
-        totalCalc.textContent = `${(fuelKg + (remainder || 0)).toFixed(0)}`;
-    } else {
-        totalCalc.textContent = '-';
-    }
-
-    // Обновление статуса
-    if (!isNaN(fob) && !isNaN(remainder) && density >= 0.75 && density <= 0.86) {
-        const total = fuelKg + remainder;
-        const diff = Math.abs(fob - total);
+    // Если заполнены все 4 поля
+    if (litersStr !== "" && densityStr !== "" && remainderStr !== "" && fobStr !== "") {
+        let fuelKg = 0;
+        if (density >= 0.75 && density <= 0.86) {
+            fuelKg = liters * density;
+        }
+        const totalFuel = (fuelKg + remainder).toFixed(0);
+        const diff = Math.abs(fob - (fuelKg + remainder));
         const isValid = diff <= 200;
 
+        statusCard.innerHTML = `
+            <div class="status-icon">${isValid ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}</div>
+            <div class="status-content">
+                <div class="calculation-line">
+                    <i class="fas fa-gas-pump comparison-sign"></i>
+                    <span class="fuel-value" id="totalCalc">${totalFuel}</span>
+                     |
+                    <i class="fas fa-plane comparison-sign"></i>
+                    <span class="fuel-value" id="fobValue">${fob}</span>
+                </div>
+                <div class="deviation" id="deviationInfo">Разница: ${diff.toFixed(0)} кг</div>
+            </div>
+        `;
         statusCard.style.background = isValid ? 'var(--success)' : 'var(--error)';
-        statusIcon.innerHTML = isValid ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>';
-        fobValue.textContent = `${fob}`;
-        deviationInfo.innerHTML = `Разница: ${diff.toFixed(0)} кг`;
-    } else {
-        statusCard.style.background = 'var(--status-bg)';
-        statusIcon.innerHTML = '';
-        fobValue.textContent = '-';
-        deviationInfo.textContent = '';
+        return;
     }
+
+    // Если ни одно из условий не выполнено – отображаем начальное состояние
+    statusCard.innerHTML = `
+        <div class="status-icon"><i class="fa-solid fa-pen"></i></div>
+        <div class="status-content" id="statusContent">Введите значения</div>
+    `;
+    statusCard.style.background = 'var(--status-bg)';
 }
+
 
 // Инициализация
 document.querySelectorAll('input').forEach(input => {

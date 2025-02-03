@@ -45,6 +45,18 @@
             padding: 1rem;
         }
 
+        /* Убираем стрелки в input type="number" для WebKit-браузеров (Safari, Chrome) */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Для Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         .container {
             max-width: 480px;
             width: 100%;
@@ -212,7 +224,7 @@
 <body>
     <div class="container">
         <div class="status-card" id="statusCard">
-            <div class="status-icon"><i class="fa-solid fa-pen"></i></div>
+            <div class="status-icon"><i class="fa-solid fa-arrow-down-long"></i></div>
             <div class="status-content" id="statusContent">Введите значения</div>
         </div>
 
