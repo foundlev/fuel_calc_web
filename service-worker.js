@@ -1,13 +1,8 @@
 const CACHE_NAME = "wind-calculator-cache-v4";
 const CACHE_URLS = [
-  "/favicon.ico",
-  "/logo_64.png",
-  "/logo_128.png",
-  "/logo_256.png",
   "/index.html",
-  "/styles.css",
+  "/style.css",
   "/script.js",
-  "/list.json"
 ];
 
 // Устанавливаем время жизни кэша в миллисекундах (20 часов)
