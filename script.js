@@ -215,7 +215,7 @@ function validateInputs() {
                     <i class="fa-solid fa-gauge-high"></i>
                     <span class="fuel-value" id="fobValue">${formatNumber(fob)} кг</span>
                 </div>
-                <div class="deviation" id="deviationInfo">Заправка + ост и FOB. Разница: ${formatNumber(diff)} кг</div>
+                <div class="deviation" id="deviationInfo">Заправка + ост и FOB.<br>Разница: ${formatNumber(diff)} кг</div>
             </div>
         `;
         statusCard.style.background = isValid ? 'var(--success)' : 'var(--error)';
