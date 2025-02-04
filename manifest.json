@@ -1,0 +1,9 @@
+{
+  "name": "Fuel Calc",
+  "short_name": "Fuel Calc",
+  "start_url": "/fuel_calc_web/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007BFF",
+  "icons": []
+}
