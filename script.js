@@ -167,7 +167,6 @@ function validateInputs() {
             <div class="status-icon"><i class="fa-solid fa-calculator"></i></div>
             <div class="status-content">
                 <div class="calculation-line">
-                    <i class="fas fa-gas-pump comparison-sign"></i>
                     <span class="fuel-value" id="totalCalc">Заправить: ${formatNumber(fuelKg)} кг</span>
                 </div>
                 <div class="deviation" id="deviationInfo">Заправка (FOB - ост) в кг</div>
@@ -188,7 +187,6 @@ function validateInputs() {
             <div class="status-icon"><i class="fa-solid fa-calculator"></i></div>
             <div class="status-content">
                 <div class="calculation-line">
-                    <i class="fas fa-gas-pump comparison-sign"></i>
                     <span class="fuel-value" id="totalCalc">Заправить: ${formatNumber(fuelLtr)} л</span>
                 </div>
                 <div class="deviation" id="deviationInfo">Заправка (FOB - ост) в литрах</div>

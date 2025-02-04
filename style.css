@@ -36,7 +36,7 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 /* Убираем стрелки в input type="number" для WebKit-браузеров (Safari, Chrome) */
@@ -57,12 +57,12 @@ input[type="number"] {
     margin: auto;
     background: var(--surface);
     border-radius: 20px;
-    padding: 1.5rem;
+    padding: 1.0rem;
     box-shadow: var(--shadow);
 }
 
 .status-card {
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
     background: var(--status-bg);
     color: white;
@@ -75,7 +75,7 @@ input[type="number"] {
 }
 
 .status-icon {
-    font-size: 2.4rem;
+    font-size: 2.0rem;
     text-align: center;
 }
 
@@ -89,7 +89,7 @@ input[type="number"] {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.3rem;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
 }
 
 .fuel-value {
@@ -102,6 +102,10 @@ input[type="number"] {
 
 .calculation-line i {
     margin: 0;
+}
+
+.calculation-line fa-equals, .calculation-line fa-not-equal {
+    font-size: 1.0rem;
 }
 
 .deviation {
