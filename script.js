@@ -111,6 +111,20 @@ function validateInputs() {
         return;
     }
 
+    // Если не заполнены только "Заправка (л)"
+    if (litersStr === "" && densityStr !== "" && remainderStr !== "" && fobStr !== "") {
+        let fuelLiters = 0;
+        if (density >= 0.75 && density <= 0.86) {
+            fuelLiters = (fob - remainder) / density;
+        }
+        statusCard.innerHTML = `
+            <div class="status-icon"><i class="fas fa-gas-pump"></i></div>
+            <div class="status-content" id="statusContent">Заправка: ${fuelLiters.toFixed(0)} л</div>
+        `;
+        statusCard.style.background = 'var(--status-bg)';
+        return;
+    }
+
     // Если заполнены все 4 поля
     if (litersStr !== "" && densityStr !== "" && remainderStr !== "" && fobStr !== "") {
         let fuelKg = 0;
